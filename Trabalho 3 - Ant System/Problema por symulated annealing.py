@@ -27,6 +27,9 @@ def cut_overlap(cut1, cut2):
     :param cut2: tupla (largura, altura, tipo)
     :return: True se os cortes se sobrepõem, False caso contrário
     """
+    if len(cut1) < 2 or len(cut2) < 2:
+        return False
+    
     # Extrai as dimensões dos cortes
     w1, h1 = cut1[:2]
     w2, h2 = cut2[:2]
@@ -37,6 +40,7 @@ def cut_overlap(cut1, cut2):
         return True
     else:
         return False
+
 
 
 def generate_cut(plate_dimensions, cut_list):
@@ -50,6 +54,13 @@ def generate_cut(plate_dimensions, cut_list):
     Returns:
     - a tuple with the width, height and type of the new cut
     """
+    if not cut_list:
+        # if the cut list is empty, generate a random cut
+        cut_type = random.choice(["A", "B", "C", "D"])
+        w = random.randint(1, plate_dimensions[0])
+        h = random.randint(1, plate_dimensions[1])
+        return (w, h, cut_type)
+    
     # define the possible types of cuts
     cut_types = ["A", "B", "C", "D"]
 
@@ -67,6 +78,7 @@ def generate_cut(plate_dimensions, cut_list):
                 return new_cut
 
 
+
 def neighbor(cut_list, plate_dimensions):
     new_cut_list = cut_list.copy()
     while True:
@@ -75,7 +87,7 @@ def neighbor(cut_list, plate_dimensions):
         removed_cut = new_cut_list.pop(cut_idx)
         
         # generate a new cut to replace the removed cut
-        new_cut = generate_cut(plate_dimensions)
+        new_cut = generate_cut(plate_dimensions, new_cut_list)
         
         # check if the new cut fits within the plate dimensions
         if new_cut[0] <= plate_dimensions[0] and new_cut[1] <= plate_dimensions[1]:
@@ -87,6 +99,7 @@ def neighbor(cut_list, plate_dimensions):
             # if the new cut doesn't fit within the plate dimensions,
             # add the removed cut back to the list
             new_cut_list.insert(cut_idx, removed_cut)
+            continue
 
 
 def acceptance_probability(delta, T):
@@ -109,56 +122,51 @@ def acceptance_probability(delta, T):
 
 def simulated_annealing(cut_list, plate_width, plate_height, T=1000.0, T_min=0.01, alpha=0.99, max_iter=1000):
     """
-    Executa o algoritmo Simulated Annealing para encontrar a melhor solução
+    Executa o algoritmo Simulated Annealing para otimizar o corte de uma chapa retangular.
 
     Args:
-    - cut_list: lista de tuplas com as dimensões dos cortes [(w1, h1, t1), (w2, h2, t2), ...]
-    - plate_width: largura da placa
-    - plate_height: altura da placa
-    - T: temperatura inicial
-    - T_min: temperatura final (critério de parada)
-    - alpha: fator de resfriamento
-    - max_iter: número máximo de iterações (critério de parada)
+    cut_list (list): Lista de cortes, onde cada corte é uma tupla (largura, altura, tipo).
+    plate_width (float): Largura da chapa.
+    plate_height (float): Altura da chapa.
+    T (float): Temperatura inicial.
+    T_min (float): Temperatura mínima.
+    alpha (float): Fator de redução da temperatura.
+    max_iter (int): Número máximo de iterações.
 
     Returns:
-    - cut_list: a melhor solução encontrada
-    - cost_list: lista com o custo de cada iteração
+    list: Lista de cortes otimizada.
     """
+    best_cut_list = cut_list.copy()
+    best_cost = cut_cost(cut_list, plate_width, plate_height)
 
-    # inicializa a lista de custos
-    cost_list = []
-    iter_count = 0
-    
-    # calcula o custo da solução inicial
-    current_cost = cut_cost(cut_list, plate_width, plate_height)
-    cost_list.append(current_cost)
+    current_cut_list = cut_list.copy()
+    current_cost = best_cost
 
-    # executa o algoritmo até atingir a temperatura mínima ou o número máximo de iterações
-    while T > T_min and iter_count < max_iter:
-        # gera uma solução vizinha
-        new_cut_list = neighbor(cut_list, (plate_width, plate_height))
+    cost_list = [best_cost]
 
-        # calcula o custo da nova solução
+    for i in range(max_iter):
+        T = alpha * T
+
+        new_cut_list = neighbor(current_cut_list, (plate_width, plate_height))
         new_cost = cut_cost(new_cut_list, plate_width, plate_height)
 
-        # calcula a diferença de custo
         delta = new_cost - current_cost
 
-        # verifica se a nova solução é melhor ou se deve ser aceita com probabilidade e^(-delta/T)
-        if delta < 0 or acceptance_probability(delta, T) > random.random():
-            cut_list = new_cut_list
+        if acceptance_probability(delta, T) > random.random():
+            current_cut_list = new_cut_list.copy()
             current_cost = new_cost
 
-        # resfria a temperatura
-        T *= alpha
-        
-        # adiciona o custo da iteração atual à lista de custos
-        cost_list.append(current_cost)
+            if new_cost < best_cost:
+                best_cut_list = new_cut_list.copy()
+                best_cost = new_cost
+                cut_list = new_cut_list.copy() # <-- Add this line to update the cut_list
 
-        # incrementa o contador de iterações
-        iter_count += 1
-        
-    return cut_list, cost_list
+        cost_list.append(best_cost)
+
+        if T < T_min:
+            break
+
+    return cut_list
 
 
 def plot_solution(best_solution):
@@ -184,7 +192,7 @@ if __name__ == '__main__':
     cut_list = [(2, 3), (4, 2), (3, 3), (1, 4)]
 
     # Encontra a melhor solução utilizando o algoritmo Simulated Annealing
-    best_solution, best_cost = simulated_annealing(cut_list, plate_width, plate_height)
+    cut_list = simulated_annealing(cut_list, plate_width, plate_height)
 
     plot_solution(best_solution)
 
