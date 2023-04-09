@@ -1,0 +1,294 @@
+programe o seguinte pseudo-código em python: 1. Initialize:
+Set t: 0
+Set NC:=0
+[t is the time counter}
+[NC is the cycles counter}
+For every edge (i,j) set an initial value Tij(t)=c for trail intensity and Ati=0
+Place the m ants on the n nodes
+Here's the Python code for the given pseudo-code:
+
+css
+Copy code
+t = 0
+NC = 0
+c = 1
+# Define edges as a list of tuples (i,j)
+edges = [(i,j) for i in range(n) for j in range(n) if i!=j]
+# Initialize Tij(t) and Ati
+Tij = {(i,j): c for (i,j) in edges}
+Ati = {i: 0 for i in range(n)}
+
+# Define a function to place ants on nodes
+def place_ants(m, n):
+    ants = {}
+    for ant in range(m):
+        node = random.randint(0, n-1)
+        ants[ant] = node
+    return ants
+
+ants = place_ants(m, n)
+In this code, n is the number of nodes, m is the number of ants, and random is the Python built-in module for generating random numbers.
+
+
+
+
+João Pedro Peres Bertoncelo
+continue com esse pseudo-código: 2. Set s:=1
+[s is the tabu list index}
+For k:=1 to m do
+Place the starting town of the k-th ant in tabu (s)
+Sure, here's the continuation of the Python code based on the given pseudo-code:
+
+scss
+Copy code
+s = 1
+tabu_list = {ant: [] for ant in range(m)}
+
+for k in range(m):
+    start_node = ants[k]
+    tabu_list[k].append(start_node)
+In this code, tabu_list is a dictionary where the keys are ants and the values are lists of nodes that the ants are not allowed to visit (i.e., the tabu list). The starting node of each ant is added to its corresponding tabu list.
+
+
+
+
+João Pedro Peres Bertoncelo
+continue com esse pseudo codigo: 3. Repeat until tabu list is full
+Set s:=s+1
+For k:=1 to m do
+[this step will be repeated (n-1) times]
+Choose the town j to move to, with probability pj (t) given by equation (4)
+[at time t the k-th ant is on town i-tabu, (s-1)}
+Move the k-th ant to the town j
+Insert town j in tabug(s)
+Sure, here's the continuation of the Python code based on the given pseudo-code:
+
+python
+Copy code
+while len(tabu_list[0]) < n:
+    s += 1
+    for k in range(m):
+        current_node = tabu_list[k][-1]
+        unvisited_nodes = [node for node in range(n) if node not in tabu_list[k]]
+        probabilities = [calculate_probability(current_node, node, Tij, Ati) for node in unvisited_nodes]
+        if sum(probabilities) == 0:
+            # All unvisited nodes have zero probability, so select a node uniformly at random
+            next_node = random.choice(unvisited_nodes)
+        else:
+            # Select the next node based on the probability distribution
+            probabilities = [p/sum(probabilities) for p in probabilities]
+            next_node = np.random.choice(unvisited_nodes, p=probabilities)
+        ants[k] = next_node
+        tabu_list[k].append(next_node)
+In this code, calculate_probability is a function that calculates the probability of selecting a particular node based on the current trail intensity and the attractiveness of the edge connecting the current node to the candidate node. np.random.choice is a function from the NumPy library that selects a random element from a list with the given probability distribution.
+
+
+
+
+João Pedro Peres Bertoncelo
+continue com o seguinte pseudo-código: 4. For k:=1 to m do
+Move the k-th ant from tabug(n) to tabuk(1)
+Compute the length L of the tour described by the k-th ant
+Update the shortest tour found
+For every edge (i,j)
+For k:=1 to m do
+ATK
+if (i,j) € tour described by tabu
+L
+=
+W
+0 otherwise
+At:= At1+At;
+Sure, here's the continuation of the Python code based on the given pseudo-code:
+
+python
+Copy code
+shortest_tour = None
+shortest_length = float('inf')
+
+for k in range(m):
+    # Move the ant back to the starting node
+    tabu_list[k].append(tabu_list[k][0])
+    # Calculate the length of the tour
+    length = calculate_tour_length(tabu_list[k], W)
+    # Update the shortest tour if necessary
+    if length < shortest_length:
+        shortest_tour = tabu_list[k]
+        shortest_length = length
+
+# Update the pheromone trail intensity
+for (i, j) in edges:
+    delta_tij = 0
+    for k in range(m):
+        if (i, j) in pairwise(shortest_tour):
+            delta_tij += Q/shortest_length
+    Tij[(i, j)] = (1-rho)*Tij[(i, j)] + delta_tij
+    Ati[i] += delta_tij
+In this code, calculate_tour_length is a function that calculates the length of the tour described by a given tabu list, using the weight matrix W. pairwise is a function from the itertools library that generates all pairs of adjacent elements in a list. Q is a constant parameter that controls the amount of pheromone deposited, and rho is a constant parameter that controls the rate of pheromone evaporation. The pheromone trail intensity Tij is updated based on the amount of pheromone deposited by the ants, and the attractiveness Ati is updated based on the total amount of pheromone deposited on node i.
+
+
+
+
+João Pedro Peres Bertoncelo
+continue com o seguinte pseudo código: 5. For every edge (i,j) compute Tij(t+n) according to equation Tij(t+n)=p Tij(t)+ÁTij Set t:=t+n
+Set NC:=NC+1
+For every edge (i,j) set Atij:=0
+Sure, here's the continuation of the Python code based on the given pseudo-code:
+
+makefile
+Copy code
+# Update the pheromone trail intensity after all ants have completed their tours
+for (i, j) in edges:
+    Tij[(i, j)] = (1 - p)*Tij[(i, j)] + p*Ati[i]*Atj[j]
+
+# Reset the attractiveness of all edges
+Ati = {i: 0 for i in range(n)}
+
+# Update the time and cycle counters
+t += n
+NC += 1
+In this code, p is a constant parameter that controls the relative importance of the pheromone trail intensity and the attractiveness in the probability calculation. After all ants have completed their tours, the pheromone trail intensity Tij is updated based on the amount of pheromone deposited by the ants and the evaporation rate p. The attractiveness of all edges is reset to zero. Finally, the time and cycle counters t and NC are updated.
+
+
+
+
+João Pedro Peres Bertoncelo
+continue com o seguinte pseudo-código: 6. If (NC< NCMAX) and (not stagnation behavior)
+then
+else
+Empty all tabu lists
+Goto step 2
+Print shortest tour
+Stop
+Sure, here's the continuation of the Python code based on the given pseudo-code:
+
+python
+Copy code
+if NC < NCMAX and not stagnation_behavior():
+    # Continue the search
+    pass
+else:
+    # Restart the search
+    tabu_list = [[] for _ in range(m)]
+    initialize_pheromone_trail_intensity()
+    t = 0
+    NC = 0
+
+if NC % 10 == 0:
+    # Check for stagnation behavior every 10 cycles
+    if is_stagnating(shortest_length, stagnation_threshold):
+        stagnation_behavior = True
+    else:
+        stagnation_behavior = False
+
+# Print the shortest tour found so far
+print("Shortest tour:", shortest_tour)
+In this code, NCMAX is a constant parameter that determines the maximum number of cycles to be performed. stagnation_behavior is a function that checks for stagnation behavior, which is when the shortest tour found does not improve over a certain number of cycles. stagnation_threshold is a constant parameter that determines the number of cycles without improvement that indicate stagnation behavior. If the search has not reached the maximum number of cycles and there is no stagnation behavior, the search continues. Otherwise, the search is restarted by emptying all tabu lists, initializing the pheromone trail intensity, and resetting the time and cycle counters. Every 10 cycles, the code checks for stagnation behavior using the is_stagnating function, which returns True if the shortest tour has not improved over the last stagnation_threshold cycles. Finally, the code prints the shortest tour found so far.
+
+
+
+
+João Pedro Peres Bertoncelo
+cada um terá seu próprio método separado ou será em algum dos métodos dados?
+Os diferentes trechos de código que correspondem a cada uma das etapas descritas no pseudo-código podem ser colocados em métodos separados para facilitar a legibilidade e modularidade do código.
+
+Por exemplo, é possível ter um método initialize() que inicializa as variáveis e estruturas de dados necessárias para o algoritmo de formiga, um método move_ant() que implementa o movimento da formiga de uma cidade para outra, um método update_pheromones() que atualiza as intensidades das trilhas de feromônio deixadas pelas formigas, um método check_stagnation() que verifica se o algoritmo está em um estado de estagnação e precisa ser reiniciado, e assim por diante.
+
+Dessa forma, cada método pode se concentrar em uma etapa específica do algoritmo, tornando o código mais fácil de ler, entender e manter.
+
+
+
+
+João Pedro Peres Bertoncelo
+pode me dar um exemplo de main aplicavel ao problema?
+Claro, aqui está um exemplo de como a lógica descrita no pseudo-código pode ser implementada em um método main() em Python:
+
+python
+Copy code
+import random
+
+# Parameters
+m = 10  # number of ants
+n = 20  # number of cities
+c = 1  # initial trail intensity
+Q = 100  # pheromone constant
+alpha = 1  # pheromone factor
+beta = 5  # distance factor
+rho = 0.5  # evaporation rate
+NCMAX = 1000  # maximum number of cycles
+stagnation_threshold = 50  # number of cycles without improvement before restart
+
+# Data structures
+distances = [[random.randint(1, 10) for j in range(n)] for i in range(n)]
+pheromones = [[c for j in range(n)] for i in range(n)]
+tabu_list = [[] for i in range(m)]
+shortest_tour = []
+shortest_length = float("inf")
+t = 0
+NC = 0
+stagnation_behavior = False
+
+
+def initialize():
+    global tabu_list, shortest_tour, shortest_length
+    tabu_list = [[] for i in range(m)]
+    shortest_tour = []
+    shortest_length = float("inf")
+
+
+def move_ant(k):
+    # Implementation of the ant movement step
+    pass
+
+
+def update_pheromones():
+    # Implementation of the pheromone update step
+    pass
+
+
+def check_stagnation():
+    # Implementation of the stagnation check step
+    pass
+
+
+def main():
+    global shortest_tour, shortest_length, t, NC, stagnation_behavior
+
+    # Initialization
+    initialize()
+
+    while NC < NCMAX:
+        # Ant movement step
+        for k in range(m):
+            move_ant(k)
+
+        # Pheromone update step
+        update_pheromones()
+
+        # Stagnation check step
+        if NC % 10 == 0:
+            if check_stagnation():
+                stagnation_behavior = True
+            else:
+                stagnation_behavior = False
+
+        # Cycle counter update
+        t += 1
+        NC += 1
+
+    # Restart if in stagnation behavior or reached maximum cycles
+    if stagnation_behavior or NC == NCMAX:
+        initialize()
+        t = 0
+        NC = 0
+
+    # Print the shortest tour found
+    print("Shortest tour:", shortest_tour)
+Este exemplo inclui uma definição dos parâmetros do problema, bem como as estruturas de dados necessárias. A função initialize() é usada para reinicializar as estruturas de dados quando necessário. O método move_ant() implementa o movimento da formiga de uma cidade para outra. O método update_pheromones() atualiza as intensidades das trilhas de feromônio deixadas pelas formigas. O método check_stagnation() verifica se o algoritmo está em um estado de estagnação e precisa ser reiniciado.
+
+O loop principal do algoritmo é executado dentro do método main(). Ele inclui as etapas descritas no pseudo-código, ou seja, a movimentação da formiga, a atualização das trilhas de feromônio e a verificação de estagnação. Se o algoritmo estiver em um estado de estagnação ou atingir o número máximo de ciclos, ele será reiniciado chamando a função initialize() e redefinindo as variáveis relevantes.
+
+Finalmente, o
+
+
+
