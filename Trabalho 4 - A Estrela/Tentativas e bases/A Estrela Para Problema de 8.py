@@ -15,7 +15,6 @@ goal_state = [
     [6, 7, 8]
 ]
 
-
 # Esta função calcula a distância de Manhattan entre o estado atual e o estado objetivo de um quebra-cabeça deslizante de 8 peças.
 def manhattan_distance(state, goal_state):
     distance = 0
@@ -26,7 +25,7 @@ def manhattan_distance(state, goal_state):
             # Verifica se o valor não é zero (representando o espaço vazio)
             if value != 0:
                 # Verifica se o valor está na posição correta no estado objetivo
-                if state[i][j] == goal_state[i][j]:
+                if state[i][j] != goal_state[i][j]:
                     distance += 1
                     
     # Retorna a distância de Manhattan
@@ -141,7 +140,8 @@ def astar(initial_state, goal_state):
     # Cria uma fila de prioridade vazia
     queue = create_priority_queue()
     # Dicionário que armazena os custos até chegar em cada estado
-    g_score = {initial_state: 0}
+    initial_state = 0
+    g_score = {initial_state}
     # Adiciona o estado inicial na fila de prioridade com o custo estimado
     add_to_priority_queue(queue, initial_state, calculate_cost(initial_state, goal_state, 0))
     
@@ -189,3 +189,4 @@ if __name__ == '__main__':
             print(state)
     else:
         print("Não há solução possível para este problema.")
+
