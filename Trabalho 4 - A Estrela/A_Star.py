@@ -1,10 +1,8 @@
-import matplotlib.pyplot as plt
-
 # Definindo o estado inicial
 initial_state = [
     [2, 8, 3],
     [1, 6, 4],
-    [7, 0, 5]
+    [7, 5, 0]
 ]
 
 # Definindo o estado objetivo
@@ -14,24 +12,25 @@ goal_state = [
     [7, 6, 5]
 ]
 
+# Calcula o custo h
 def heuristic(state, goal_state):
     distance = 0
     # Loop pelos elementos do estado atual
     for i in range(3):
         for j in range(3):
             value = state[i][j]
-            # Verifica se o valor não é zero (representando o espaço vazio)
-            if value != 0:
-                # Verifica se o valor está na posição correta no estado objetivo
-                if state[i][j] != goal_state[i][j]:
-                    distance += 1
+            # Verifica se o valor está na posição correta no estado objetivo
+            if state[i][j] != goal_state[i][j]:
+                distance += 1
     return distance
 
+# Calcula o custo f
 def f(state, goal_state, g_score):
     h_score = heuristic(state, goal_state)
     f_score = g_score + h_score
     return f_score
 
+# Obtém os sucessores do estado atual
 def move_zero(state, move,zero_x,zero_y):
     new_state = [row[:] for row in state]
     if move == "up":
@@ -48,6 +47,7 @@ def move_zero(state, move,zero_x,zero_y):
         new_state[zero_x][zero_y + 1] = 0
     return new_state
 
+# Obtém os sucessores do estado atual
 def get_successors(state):
     zero_x = 0
     zero_y = 0
@@ -80,6 +80,7 @@ def possible_moves(state, zero_x, zero_y):
         moves.append("right")
     return moves
 
+# Seleciona o melhor estado da fila de prioridade
 def select_best(queue):
     best = queue[0]
     for i in range(len(queue)):
@@ -106,6 +107,10 @@ def main():
     # Definindo o conjunto de estados que não foram visitados
     not_visited = []
 
+    print("Estado inicial: ", current_state)
+    print("Custo g: ", g_score)
+    print("Heurística: ", heuristic(current_state, goal_state))
+    
     while current_state != goal_state:
         # Adiciona o estado atual na lista de estados visitados
         visited.append(current_state)
@@ -137,11 +142,14 @@ def main():
 
         # Atualiza o custo g
         g_score = best[1] - heuristic(current_state, goal_state)
+        f_score = f(current_state, goal_state, g_score) 
 
         # Remove o melhor estado da fila de prioridade
         queue.remove(best)
 
         print("Estado atual: ", current_state)
+        print("Custo g: ", g_score)
+        print("Heurística: ", heuristic(current_state, goal_state))
 
     # Imprime o estado atual
     print("Estado final: ",current_state)

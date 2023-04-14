@@ -1,0 +1,8 @@
+calcular distancia V
+calcular caminho percorrido 
+calcular f(x) V
+analisar sucessores V
+Verificar movimentos possíveis V
+selecionar melhor caminho
+printar melhor caminho
+condição de parada => distance = 0
